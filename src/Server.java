@@ -11,6 +11,11 @@ import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.SequentialGroup;
+import javax.swing.GroupLayout.ParallelGroup;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -34,33 +39,58 @@ public class Server extends javax.swing.JFrame {
     public static Socket socket = null;
     public boolean close = false;
     public static int port;
+    private ChatLog chatLog;
+    private ServerThread serverThread;
+    private ClientThread clientThread;
     
-    public Server() {
+    public Server() throws IOException {
         initComponents();
+        chatLog = new ChatLog();
+        jTextArea1.append(chatLog.retrieveChatLog());
         ActiveClients = new HashMap<String, Socket>();
     }
     
-   /* public void start()
+   
+    
+    @SuppressWarnings("empty-statement")
+    public void viewUsers()
     {
-        port = Integer.parseInt(jTextField1.getText());
-        
-            try {
-                serverSocket = new ServerSocket(port);
-                while(close==false)
-                {
-                    socket = serverSocket.accept();
-                    if(socket!=null)
-		    {
-			new ClientThread(socket).start();
-                        socket = null;
-		    }
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        
-        
-    }*/
+          String user;
+          JLabel label[] = new JLabel[ActiveClients.size()];
+          Iterator entries = ActiveClients.entrySet().iterator();
+          jPanel3.removeAll();
+          javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+          jPanel3.setLayout(jPanel3Layout);
+          ParallelGroup horizontalGroup = jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING);
+          SequentialGroup verticalGroup = jPanel3Layout.createSequentialGroup();
+          verticalGroup.addContainerGap();
+          int i=0;
+          while(entries.hasNext())
+          {
+              Entry thisEntry = (Entry)entries.next();
+              user = (String)thisEntry.getKey();
+              label[i] = new JLabel(user);
+              horizontalGroup.addComponent(label[i], javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE);
+              verticalGroup.addComponent(label[i]);
+              verticalGroup.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED);
+              i++;
+          }
+          verticalGroup.addContainerGap(220-ActiveClients.size()*20, Short.MAX_VALUE);
+          jPanel3Layout.setHorizontalGroup(
+          jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(horizontalGroup)
+                .addContainerGap())
+          );
+          jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(verticalGroup)
+          );
+
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -78,9 +108,10 @@ public class Server extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
         jLabel2 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel3 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -122,20 +153,33 @@ public class Server extends javax.swing.JFrame {
 
         jLabel2.setText("Port");
 
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 164, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 220, Short.MAX_VALUE)
+        );
+
+        jScrollPane1.setViewportView(jPanel3);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField1)))
@@ -147,8 +191,8 @@ public class Server extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jTextField1)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -183,11 +227,14 @@ public class Server extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-         new ServerThread().start();    // TODO add your handling code here:
+        serverThread =  new ServerThread();
+        serverThread.start();    // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         close = true;// TODO add your handling code here:
+        chatLog.logChatText(jTextArea1.getText());
+        
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -220,7 +267,11 @@ public class Server extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Server().setVisible(true);
+                try {
+                    new Server().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -232,6 +283,7 @@ public class Server extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
@@ -256,7 +308,8 @@ public class Server extends javax.swing.JFrame {
                         socket = serverSocket.accept();
                         if(socket!=null)
                         {
-                            new ClientThread(socket).start();
+                            Server.this.clientThread = new ClientThread(socket);
+                            Server.this.clientThread.start();
                             socket = null;
                         }
                     }
@@ -296,23 +349,52 @@ public class Server extends javax.swing.JFrame {
                             From = clientMessage;
                             Server.this.ActiveClients.put(From,socket);
                             Server.this.jLabel1.setText("Connected Users:"+Server.this.ActiveClients.size());
-                            //Server.this.jTextArea1.append(From+" Connected");
-                            //Server.this.repaint();
+                            Server.this.viewUsers();
+                            Iterator entries = Server.this.ActiveClients.entrySet().iterator();
+                               while(entries.hasNext())
+                               {
+                                    Entry thisEntry = (Entry)entries.next();
+                                    users = (String)thisEntry.getKey();
+                                    socket = (Socket)thisEntry.getValue();
+                                    out = new PrintWriter(socket.getOutputStream(),true);
+                                    out.println(From+" has joined...");
+                                }
+                                Server.this.jTextArea1.append(From+" has joined...\n");
                             getInfo=true;
                             clientMessage = null;
                         }
                         else
                         {
-                           Iterator entries = Server.this.ActiveClients.entrySet().iterator();
-                           while(entries.hasNext())
+                           if(clientMessage.equals("disc"+From))
                            {
-                               Entry thisEntry = (Entry)entries.next();
-                               users = (String)thisEntry.getKey();
-                               socket = (Socket)thisEntry.getValue();
-                               out = new PrintWriter(socket.getOutputStream(),true);
-                               out.println(From+" : "+clientMessage);
+                               Server.this.ActiveClients.remove(From);
+                               Server.this.jLabel1.setText("Connected Users:"+Server.this.ActiveClients.size());
+                               Server.this.viewUsers();
+                               Iterator entries = Server.this.ActiveClients.entrySet().iterator();
+                               while(entries.hasNext())
+                               {
+                                    Entry thisEntry = (Entry)entries.next();
+                                    users = (String)thisEntry.getKey();
+                                    socket = (Socket)thisEntry.getValue();
+                                    out = new PrintWriter(socket.getOutputStream(),true);
+                                    out.println(From+" has left...");
+                                }
+                                Server.this.jTextArea1.append(From+" has left...\n");
                            }
-                           Server.this.jTextArea1.append(From+" : "+clientMessage+"\n");
+                           else
+                           {
+                               Iterator entries = Server.this.ActiveClients.entrySet().iterator();
+                               while(entries.hasNext())
+                               {
+                                    Entry thisEntry = (Entry)entries.next();
+                                    users = (String)thisEntry.getKey();
+                                    socket = (Socket)thisEntry.getValue();
+                                    out = new PrintWriter(socket.getOutputStream(),true);
+                                    out.println(From+" : "+clientMessage);
+                                }
+                                Server.this.jTextArea1.append(From+" : "+clientMessage+"\n");
+                           }
+                           
                            clientMessage = null;
                         }
                     }

@@ -8,7 +8,7 @@ public class ChatLog
 	private BufferedWriter logWriter;
 
 	// default constructor
-	public ChatLog()
+	public ChatLog() throws FileNotFoundException, IOException
 	{
 		logReader = new BufferedReader(new FileReader(logfile));
 		logWriter = new BufferedWriter(new FileWriter(logfile, true));
