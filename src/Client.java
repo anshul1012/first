@@ -26,11 +26,14 @@ public class Client extends javax.swing.JFrame {
     Socket socket = null;
     Boolean close = false;
     Boolean ismsg = false;
+    ClientThread clientThread;
     
     /**
      * Creates new form Client
      */
     public Client() {
+        close = false;
+        ismsg = false;
         initComponents();
     }
 
@@ -77,6 +80,11 @@ public class Client extends javax.swing.JFrame {
 
         jButton3.setText("Disconnect");
         jButton3.setEnabled(false);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -218,7 +226,8 @@ public class Client extends javax.swing.JFrame {
         nickname = jTextField4.getText();
         if(ip!=null &&port!=0 && nickname!=null)
         {
-            new ClientThread().start();
+            clientThread = new ClientThread();
+            clientThread.start();
         }
         jTextField2.setEnabled(false);
         jTextField3.setEnabled(false);
@@ -237,6 +246,42 @@ public class Client extends javax.swing.JFrame {
         jButton1.setEnabled(true);
     }//GEN-LAST:event_jTextField1FocusGained
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        close = true;
+        clientThread.out.println("disc"+clientThread.user);
+        clientThread.serverThread.stop();
+        clientThread.stop();
+        //this.initComponents();
+        //this.revalidate();
+        //this.setVisible(true);*/
+        reset();
+        //close = true;
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    void reset()
+    {
+        jTextArea1.setText("");
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+        jTextField4.setText("");
+        jTextField1.setEnabled(true);
+        jTextField2.setEnabled(true);
+        jTextField3.setEnabled(true);
+        jTextField4.setEnabled(true);
+        jButton1.setEnabled(false);
+        jButton2.setEnabled(true);
+        jButton3.setEnabled(false);
+        jLabel4.setText("Disconnected");
+        jLabel4.setBackground(Color.red);
+        close = false;
+        ismsg = false;
+        //this.initComponents();
+        /*this.revalidate();
+        this.repaint();*/
+        
+    }
     /**
      * @param args the command line arguments
      */
@@ -297,6 +342,7 @@ public class Client extends javax.swing.JFrame {
         PrintWriter out;
         String message;
         String user;
+        ServerThread serverThread;
         public void run()
         {
             try {
@@ -310,7 +356,8 @@ public class Client extends javax.swing.JFrame {
                         out = new PrintWriter(socket.getOutputStream(),true);
                         user = Client.this.jTextField4.getText();
                         out.println(user);
-                        new ServerThread(socket).start();
+                        serverThread = new ServerThread(socket);
+                        serverThread.start();
                     }
             //BufferedReader ser = new BufferedReader(new InputStreamReader(skt.getInputStream()));
             //message = in.readLine();
@@ -321,7 +368,7 @@ public class Client extends javax.swing.JFrame {
             while(!Client.this.close)
             {
                 try {
-                    sleep(1000);
+                    sleep(500);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -335,6 +382,18 @@ public class Client extends javax.swing.JFrame {
                 }
                 
             }
+            /*if(Client.this.close)
+            {
+                out.println("disc"+user);
+                
+                //Client.this.jTextArea1.append("Closing Client thread");
+                Client.this.main(null);
+                Client.this.dispose();
+                serverThread.stop();
+                this.stop();
+                
+                
+            }*/
         }
                 
     }
@@ -355,10 +414,23 @@ public class Client extends javax.swing.JFrame {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 while(!Client.this.close)
                 {
+                    sleep(500);
                     msg = in.readLine();
                     Client.this.jTextArea1.append(msg+"\n");
                 }
-            } catch (IOException ex) {
+                /*Client.this.invalidate();
+                Client.this.validate();
+                Client.this.repaint();
+                Client.this.initComponents();
+                socket.close();*/
+               /* if(Client.this.close)
+                {
+                    in.close();
+                    Client.this.jTextArea1.append("Closing server thread\n");
+                    this.interrupt();
+                }*/
+                
+            } catch (Exception ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
