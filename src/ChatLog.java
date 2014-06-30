@@ -8,15 +8,16 @@ public class ChatLog
 	private BufferedWriter logWriter;
 
 	// default constructor
-	public ChatLog() throws FileNotFoundException, IOException
+	/*public ChatLog() throws FileNotFoundException, IOException
 	{
 		logReader = new BufferedReader(new FileReader(logfile));
 		logWriter = new BufferedWriter(new FileWriter(logfile, true));
-	}
+	}*/
 
 	// function to log chat text
 	public void logChatText(String chatText)
 	{
+	    logReader = new BufferedReader(new FileReader(logfile));
 		try
 		{
 			logWriter.write(chatText);
@@ -25,11 +26,13 @@ public class ChatLog
 		{
 			// to be added later
 		}
+		logReader.close();
 	}
 
 	// function to retrieve chat log
 	public String retrieveChatLog()
 	{
+	    logWriter = new BufferedWriter(new FileWriter(logfile));
 		String chatLog = "";
 		try
 		{
@@ -43,6 +46,7 @@ public class ChatLog
 		{
 			throw new RuntimeException(e);
 		}
+		logWriter.close();
 		return chatLog;
 	}
 }
