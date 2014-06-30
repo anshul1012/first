@@ -418,17 +418,7 @@ public class Client extends javax.swing.JFrame {
                     msg = in.readLine();
                     Client.this.jTextArea1.append(msg+"\n");
                 }
-                /*Client.this.invalidate();
-                Client.this.validate();
-                Client.this.repaint();
-                Client.this.initComponents();
-                socket.close();*/
-               /* if(Client.this.close)
-                {
-                    in.close();
-                    Client.this.jTextArea1.append("Closing server thread\n");
-                    this.interrupt();
-                }*/
+             
                 
             } catch (Exception ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
