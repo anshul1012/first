@@ -3,12 +3,12 @@ import java.io.*;
 public class ChatLog
 {
 	// filename
-	public static string logfile = "log.txt";
+	public static String logfile = "log.txt";
 	private BufferedReader logReader;
 	private BufferedWriter logWriter;
 
 	// default constructor
-	public ChatLog()
+	public ChatLog() throws FileNotFoundException, IOException
 	{
 		logReader = new BufferedReader(new FileReader(logfile));
 		logWriter = new BufferedWriter(new FileWriter(logfile, true));
